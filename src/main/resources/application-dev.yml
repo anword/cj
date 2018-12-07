@@ -1,0 +1,192 @@
+
+# 为mybatis设置，生产环境可删除
+restart:
+  include:
+    mapper : /mapper-[\\w-\\.]+jar
+    pagehelper : /pagehelper-[\\w-\\.]+jar
+
+spring:
+  devtools:
+    restart:
+      #热部署生效
+      enabled: false
+      #设置重启的目录,添加那个目录的文件需要restart
+      additional-paths : src/main/java
+      #排除那个目录的文件不需要restart
+      exclude : static/**,public/**,WEB-INF/**
+      #classpath目录下的WEB-INF文件夹内容修改不重启
+      
+      
+      
+  ############################################################
+  #
+  # 配置数据源相关 使用阿里巴巴的 druid 数据源
+  #
+  ############################################################
+  datasource:
+    url: jdbc:mysql://localhost:3306/zcy?serverTimezone=UTC
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    ###################以下为druid增加的配置###########################
+    type: com.alibaba.druid.pool.DruidDataSource
+    # 下面为连接池的补充设置，应用到上面所有数据源中
+    # 初始化大小，最小，最大
+    initialSize: 5
+    minIdle: 5
+    maxActive: 20
+    # 配置获取连接等待超时的时间
+    maxWait: 60000
+    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+    timeBetweenEvictionRunsMillis: 60000
+    # 配置一个连接在池中最小生存的时间，单位是毫秒
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    # 打开PSCache，并且指定每个连接上PSCache的大小
+    poolPreparedStatements: true
+    maxPoolPreparedStatementPerConnectionSize: 20
+    # 配置监控统计拦截的filters，去掉后监控界面sql无法统计，'wall'用于防火墙，此处是filter修改的地方
+    filters:
+      commons-log:
+        connection-logger-name: stat,wall,log4j
+    # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+    # 合并多个DruidDataSource的监控数据
+    useGlobalDataSourceStat: true
+
+  ############################################################
+  #
+  # freemarker 静态资源配置
+  #
+  ############################################################
+  #设定ftl文件路径
+  freemarker:
+    template-loader-path : classpath:/templates
+    # 关闭缓存, 即时刷新, 上线生产环境需要改为true
+    cache : false
+    charset : UTF-8
+    check-template-location : true
+    content-type : text/html
+    expose-request-attributes : true
+    expose-session-attributes : true
+    request-context-attribute : request
+    suffix : .ftl
+
+
+  ############################################################
+  #
+  # thymeleaf 静态资源配置
+  #
+  ############################################################
+  thymeleaf:
+    # 关闭缓存, 即时刷新, 上线生产环境需要改为true
+    cache : false
+    prefix : classpath:/templates/
+    suffix : .html
+    mode : HTML5
+    encoding : UTF-8
+    servlet:
+      content-type: text/html
+    
+  ############################################################
+  #
+  # REDIS 配置
+  #
+  ############################################################
+  # Redis数据库索引（默认为0）
+  redis:
+    database : 1
+    # 连接超时时间（毫秒）
+    timeout : 200
+    # Redis服务器地址
+    host : localhost
+    # Redis服务器连接端口
+    port : 6379
+    # Redis服务器连接密码（默认为空）
+    #password : 
+    jedis:
+      pool:
+        # 连接池最大连接数（使用负值表示没有限制）
+        max-active: 50
+        # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-wait: -1
+        # 连接池中的最大空闲连接
+        max-idle: 10
+        # 连接池中的最小空闲连接
+        min-idle: 2
+#    cluster:
+#       max-redirects: 10
+#       nodes: 127.0.0.1:6080
+    
+
+    
+    
+    
+############################################################
+#
+# Server 服务端相关配置
+#
+############################################################
+server:
+  # 配置api端口号
+  port: 8088
+  # 配置context-path, 一般来说这个配置在正式发布的时候不配置
+  #context-path : /cj
+  # 错误页，指定发生错误时，跳转的URL --> BasicErrorController
+  #server.error.path=/error
+  # session最大超时时间(分钟)，默认为30分钟
+  servlet:
+    session:
+      timeout: 60
+  # 该服务绑定IP地址，启动服务器时如本机不是该IP地址则抛出异常启动失败, 
+  # 只有特殊需求的情况下才配置, 具体根据各自的业务来设置
+  #address : 192.168.1.2
+  
+  
+  
+  
+  ############################################################
+  # Server - tomcat 相关常用配置
+  ############################################################
+  tomcat:
+    # tomcat最大线程数, 默认为200
+    #max-threads : 150
+    # tomcat的URI编码
+    uri-encoding : UTF-8
+    # 存放Tomcat的日志、Dump等文件的临时文件夹，默认为系统的tmp文件夹
+    #（如：C:\Users\Shanhy\AppData\Local\Temp）
+    #basedir : H:/springboot-tomcat-tmp
+    #accesslog:
+      # accesslog目录，默认在basedir/logs
+      #directory: 
+      #  打开Tomcat的Access日志，并可以设置日志格式的方法：
+      #enabled: true
+      #pattern: 
+
+
+
+
+############################################################
+# Mybatis 相关配置
+############################################################   
+# mybatis 配置
+mybatis:
+    type-aliases-package: com.xcj.pojo
+    mapper-locations: classpath:mapper/*.xml
+# 通用 Mapper 配置
+mapper:
+    mappers: com.xcj.utils.MyMapper
+    not-empty: false
+    identity: MYSQL
+# 分页插件配置
+pagehelper:
+    helperDialect: mysql
+    reasonable: true
+    supportMethodsArguments: true
+    params: count=countSql
+#logging:
+#  config: classpath:log4j2.xml
+    

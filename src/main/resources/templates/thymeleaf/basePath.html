@@ -1,0 +1,6 @@
+
+<script  th:fragment="basePath" xmlns:th="http://www.springframework.org/schema/mvc" type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        var basePath = [[${#httpServletRequest.getScheme() + "://" + #httpServletRequest.getServerName() + ":" + #httpServletRequest.getServerPort() + #httpServletRequest.getContextPath()}]];
+        /*]]>*/
+</script>
