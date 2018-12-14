@@ -58,75 +58,87 @@ $('input[name="login"],input[name="pwd"]').keyup(function () {
     }
 });
 var open = 0;
-layui.use('layer', function () {
-    $('input[type="button"]').click(function () {
-    	var flag = checkParams();
-    	if(flag != false){
-            //认证中..
-            fullscreen();
-            $('.login').addClass('test'); //倾斜特效
-            setTimeout(function () {
-                $('.login').addClass('testtwo'); //平移特效
-            }, 300);
-            setTimeout(function () {
-                $('.authent').show().animate({ right: -320 }, {
-                    easing: 'easeOutQuint',
-                    duration: 600,
-                    queue: false
-                });
-                $('.authent').animate({ opacity: 1 }, {
-                    duration: 200,
-                    queue: false
-                }).addClass('visible');
-            }, 500);
-            //登陆
-//            var JsonData = { userName: login, pwd: pwd, code: code };
-            console.log(JSON.stringify($('#loginForm').serializeJSON()))
-            
-            	
-        	$.ajax({
-        		url: basePath+"/login_auth",
-    			contentType: "application/json;charset=UTF-8",
-        		type: "POST",
-        		datType: "JSON",
-        		data: JSON.stringify($('#loginForm').serializeJSON()),
-        		async: false,
-        		success: function (data) {
-					 setTimeout(function () {
-		                 $('.authent').show().animate({ right: 90 }, {
-		                     easing: 'easeOutQuint',
-		                     duration: 600,
-		                     queue: false
-		                 });
-		                 $('.authent').animate({ opacity: 0 }, {
-		                     duration: 200,
-		                     queue: false
-		                 }).addClass('visible');
-		                 $('.login').removeClass('testtwo'); //平移特效
-		             }, 2000);
-		             setTimeout(function () {
-		                 $('.authent').hide();
-		                 $('.login').removeClass('test');
-		                 if (data.code == '200') {
-		
-		                     //登录成功
-		                     $('.login div').fadeOut(100);
-		                     $('.success').fadeIn(1000);
-		                     $('.success').html("登陆成功<br /><br />跳转到首页");
-		                      window.location.href=basePath+"/index";
-		                     // //跳转操作
-		
-		                 } else {
-		                     AjaxErro(data);
-		                 }
-		             }, 2400);
-                	
-        		}
-    		});
-        }
-        return false;
-    })
+$('input[type="button"]').click(function () {
+	var flag = checkParams();
+	if(flag != false){
+		$.ajax({
+			url: basePath+"/code/auth",
+			type: "GET",
+			data: {code:$(".ValidateNum").val()},
+			success: function (data) {
+				if(data.code=='200'){
+					login();
+				}else{
+					AjaxErro(data);
+				}
+			}
+		});
+	}
+    return false;
 })
+function login(){
+    //认证中..
+    fullscreen();
+    $('.login').addClass('test'); //倾斜特效
+    setTimeout(function () {
+        $('.login').addClass('testtwo'); //平移特效
+    }, 300);
+    setTimeout(function () {
+        $('.authent').show().animate({ right: -320 }, {
+            easing: 'easeOutQuint',
+            duration: 600,
+            queue: false
+        });
+        $('.authent').animate({ opacity: 1 }, {
+            duration: 200,
+            queue: false
+        }).addClass('visible');
+    }, 500);
+    //登陆
+//        var JsonData = { userName: login, pwd: pwd, code: code };
+    console.log(JSON.stringify($('#loginForm').serializeJSON()))
+    
+    	
+	$.ajax({
+		url: basePath+"/login_auth",
+		contentType: "application/json;charset=UTF-8",
+		type: "POST",
+		datType: "JSON",
+		data: JSON.stringify($('#loginForm').serializeJSON()),
+		async: false,
+		success: function (data) {
+			 setTimeout(function () {
+                 $('.authent').show().animate({ right: 90 }, {
+                     easing: 'easeOutQuint',
+                     duration: 600,
+                     queue: false
+                 });
+                 $('.authent').animate({ opacity: 0 }, {
+                     duration: 200,
+                     queue: false
+                 }).addClass('visible');
+                 $('.login').removeClass('testtwo'); //平移特效
+             }, 2000);
+             setTimeout(function () {
+                 $('.authent').hide();
+                 $('.login').removeClass('test');
+                 if (data.code == '200') {
+
+                     //登录成功
+                     $('.login div').fadeOut(100);
+                     $('.success').fadeIn(1000);
+                     $('.success').html("登陆成功<br /><br />跳转到首页");
+                      window.location.href=basePath+"/main";
+                     // //跳转操作
+
+                 } else {
+                     AjaxErro(data);
+                 }
+             }, 2400);
+        	
+		}
+	});
+}
 var fullscreen = function () {
     elem = document.body;
     if (elem.webkitRequestFullScreen) {

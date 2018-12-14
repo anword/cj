@@ -17,10 +17,13 @@ import org.apache.shiro.util.ByteSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.xcj.config.Const;
 import com.xcj.pojo.User;
 import com.xcj.utils.ResponseMsg;
 
@@ -30,16 +33,21 @@ public class LoginController {
 	private static Logger log = LoggerFactory.getLogger(LoginController.class);
 
 	@RequestMapping("/login")
-	public String shouye() {
-		Subject currentUser = SecurityUtils.getSubject();
-		Session session = currentUser.getSession();
-		log.error(session.getId().toString());
+	public String signin() {
 		return "thymeleaf/login";
 	}
-
-	@RequestMapping("/index")
-	public String login2() {
+	
+	@RequestMapping("/infoSysUser")
+	public String infoSysUser() {
 		return "thymeleaf/view/login";
+	}
+
+	@RequestMapping("/main")
+	public String main(ModelMap map) {
+		Subject currentUser = SecurityUtils.getSubject();
+		Session session = currentUser.getSession();
+		map.addAttribute(Const.SESSION_USERNAME, session.getAttribute(Const.SESSION_USERNAME));
+		return "thymeleaf/main";
 	}
 
 	@RequestMapping("/code")
@@ -50,33 +58,42 @@ public class LoginController {
 		session.setAttribute("code", "abce");
 		return "abce";
 	}
+
 	public static void main(String[] args) {
-        String hashAlgorithmName = "MD5";
-        String credentials = "administrator";
-        int hashIterations = 1024;
-        ByteSource credentialsSalt = ByteSource.Util.bytes("admin");
-        Object obj = new SimpleHash(hashAlgorithmName, credentials, credentialsSalt, hashIterations);
-        System.out.println(obj);
-    }
+		String hashAlgorithmName = "MD5";
+		String credentials = "administrator";
+		int hashIterations = 1024;
+		ByteSource credentialsSalt = ByteSource.Util.bytes("admin");
+		Object obj = new SimpleHash(hashAlgorithmName, credentials, credentialsSalt, hashIterations);
+		System.out.println(obj);
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/code/auth")
+	public ResponseMsg codeAuth(@RequestParam("code") String code) {
+		
+		// 获取当前的Subject
+		Subject currentUser = SecurityUtils.getSubject();
+		Session session = currentUser.getSession();
+		if (!session.getAttribute("code").equals(code)) {
+			return ResponseMsg.errorMsg("请输入正确的验证码！！");
+		}
+		return ResponseMsg.ok();
+	}
+
 	@ResponseBody
 	@RequestMapping(value = "/login_auth")
 	public ResponseMsg login_auth(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
 //		logger.info(">>>>>>>>>>>>>>>>用户信息： " + sysUser.getUserName() + " & " + sysUser.getUserPwd());
 		String userName = user.getUsername();
 		String userPwd = user.getPassword();
-		String code = request.getParameter("code");
 		// 获取当前的Subject
 		Subject currentUser = SecurityUtils.getSubject();
+	
 		Session session = currentUser.getSession();
-		if(!session.getAttribute("code").equals(code)) {
-			return ResponseMsg.errorMsg("请输入正确的验证码！！");
-		}
-		log.error(session.getId().toString());
-		/*
-		 * Session session = currentUser.getSession();
-		 * session.setAttribute(Const.SESSION_USER, sysUser);
-		 * session.setAttribute(Const.SESSION_USERNAME, sysUser.getUserName());
-		 */
+//		session.setAttribute(Const.SESSION_USER, sysUser);
+		session.setAttribute(Const.SESSION_USERNAME, userName);
+		
 
 		if (!currentUser.isAuthenticated()) {
 			UsernamePasswordToken token = new UsernamePasswordToken(userName, userPwd);

@@ -18,7 +18,7 @@ public class User {
     private Date createtime;
 
     private Date updatetime;
-
+    
     /**
      * @return id
      */
@@ -116,4 +116,5 @@ public class User {
     public void setUpdatetime(Date updatetime) {
         this.updatetime = updatetime;
     }
+
 }

@@ -61,7 +61,9 @@ public class ShiroConfig {
 		//
 		// // 配置不会被拦截的链接 从上向下顺序判断
 		filterChainDefinitionMap.put("/login_auth", "anon");
+		filterChainDefinitionMap.put("/Flogin", "anon");
 		filterChainDefinitionMap.put("/code", "anon");
+		filterChainDefinitionMap.put("/code/*", "anon");
 		filterChainDefinitionMap.put("/css/*", "anon");
 		filterChainDefinitionMap.put("/js/*", "anon");
 		filterChainDefinitionMap.put("/js/*/*", "anon");
@@ -78,6 +80,9 @@ public class ShiroConfig {
 		filterChainDefinitionMap.put("/loginSpecial/*", "anon");
 		filterChainDefinitionMap.put("/loginSpecial/*/*", "anon");
 		filterChainDefinitionMap.put("/loginSpecial/*/*/*", "anon");
+		filterChainDefinitionMap.put("/flower/*", "anon");
+		filterChainDefinitionMap.put("/flower/*/*", "anon");
+		filterChainDefinitionMap.put("/flower/*/*/*", "anon");
 		
 		
 		filterChainDefinitionMap.put("/user/sendMsg", "anon");
